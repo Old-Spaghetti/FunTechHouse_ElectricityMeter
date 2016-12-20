@@ -1,0 +1,68 @@
+//Number of pulses, used to measure energy.
+volatile unsigned int pulseCount1_Wh  = 0;   
+volatile unsigned int pulseCount1_kWh = 0;   
+
+volatile unsigned int pulseCount2_Wh  = 0;   
+volatile unsigned int pulseCount2_kWh = 0;   
+
+volatile unsigned int updateCount = 0;   
+
+
+
+
+// The interrupt routine
+void onPulse1()
+{
+    //pulseCounter
+    pulseCount1_Wh++;
+    if(pulseCount1_Wh == 1000)
+    {
+        pulseCount1_Wh = 0;
+        pulseCount1_kWh++;
+    }
+}
+
+// The interrupt routine
+void onPulse2()
+{  
+    //pulseCounter
+    pulseCount2_Wh++;
+    if(pulseCount2_Wh == 1000)
+    {
+        pulseCount2_Wh = 0;
+        pulseCount2_kWh++;
+    }
+}
+
+
+
+void setup()
+{
+    // KWH interrupt attached to IRQ 0  = pin2
+    attachInterrupt(0, onPulse1, FALLING);
+    // KWH interrupt attached to IRQ 1  = pin3    
+    attachInterrupt(1, onPulse2, FALLING);
+
+
+}
+
+void loop()
+{
+  
+
+    //But only send data every minute or so
+    // 6 ->   6*10s =  60s = 1min
+    //12 -> 2*6*10s = 120s = 2min
+    //18 -> 3*6*10s = 180s = 3min
+    //BUT since the delay is not that accurate, 
+    // 18 is more like 3.5 to 4 minutes in real life...
+    if(updateCount > 18)
+    {
+        updateCount = 0;
+
+      
+    }
+
+    updateCount++; 
+    delay(10000); // 10*1000ms = 10s
+}
